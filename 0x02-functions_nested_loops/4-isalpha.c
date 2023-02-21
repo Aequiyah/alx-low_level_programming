@@ -1,9 +1,9 @@
 #include "main.h"
 /**
- * _isalpha - states whether letter or not
- * @c: passes value to function
+ *_isalpha - states whether letter or not
+ *@c: passes value to function
  *
- * Return: 1 if alpha 0 if not
+ *Return: 1 if alpha 0 if not
  */
 int _isalpha(int c)
 {
