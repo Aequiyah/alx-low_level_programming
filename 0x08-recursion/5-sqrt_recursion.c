@@ -1,32 +1,34 @@
-#include "notrebloh.h"
+#include "main.h"
+
+int actual_sqrt_recursion(int n, int i);
 
 /**
- * if_natural_square - check if a has natural square
- * @a: int type
- * @b: int type
- * Return: return success
- */
-int if_natural_square(int a, int b)
-{
-	if (a == (b * b))
-		return (b);
-	if (b  * b  >  a)
-		return (-1);
-	return (if_natural_square(a, b + 1));
-}
-
-/**
- * _sqrt_recursion - check if number has natural sqrt
- * @n: int type
- * Return: return success
+ * _sqrt_recursion - returns the natural square root of a number
+ * @n: number to calculate the square root of
+ *
+ * Return: the resulting square root
  */
 int _sqrt_recursion(int n)
 {
-	if (n == 1)
-		return (1);
-	if (n == 0)
-		return (0);
-	if (n  < 1)
+	if (n < 0)
 		return (-1);
-	return (if_natural_square(n, 1));
+	return (actual_sqrt_recursion(n, 0));
 }
+
+/**
+ * actual_sqrt_recursion - recurses to find the natural
+ * square root of a number
+ * @n: number to calculate the sqaure root of
+ * @i: iterator
+ *
+ * Return: the resulting square root
+ */
+int actual_sqrt_recursion(int n, int i)
+{
+	if (i * i > n)
+		return (-1);
+	if (i * i == n)
+		return (i);
+	return (actual_sqrt_recursion(n, i + 1));
+}
+
