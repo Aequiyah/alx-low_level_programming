@@ -1,3 +1,5 @@
+#include "main.h"
+
 /**
  * get_bit - Returns the value of a bit at a given index
  * @n: The number to extract the bit from
@@ -8,8 +10,10 @@
 int get _bit(unsigned long int n, unsigned int index)
 {
     if (index >= sizeof(unsigned long int) * 8)
-       return (-1); // index out of range
+              return (-1); 
+    
+    if ((n & (1 << index))== 0)
+	      return (0)
 
-
-    return ((n >> index)&1);
+    return (1)
 }   
