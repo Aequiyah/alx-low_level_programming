@@ -6,23 +6,25 @@
  *
  * return: none
  */
-void print binary(unsigned long int n)
+ void print binary(unsigned long int n)
 {
-	unsigned long int mask = 1UL << (sizeof(unsigned long int) * 8 - 1);
-	int printed = 0;
+	int i, count = 0;
+	unsigned long int current;
 
-	while (mask > 0)
+	for (i =23; i >= 0; i--)
 	{
-		if ((n & mask) == mask)
+		current = n >> i;
+
+		if (current & 1)
 		{
 			_putchar('1');
-			printed = 1;
+			count++;
 		}
-		else if (printed)
+		else if (count)
 			_putchar('0');
-		mask >>= 1;
 	}
-	if (!printed)
+	if (!count)
 		_putchar('0');
 }
-	
+
+    	
