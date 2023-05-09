@@ -2,76 +2,82 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <fcntl.h>
+#include <string.h>
 #include <elf.h>
 
-/**
- * print_error - print error message to stderr and exit with status code 98
- * @msg: error message to print
- */
-void print_error(char *msg)
-{
-        fprintf(stderr, "%s\n", msg);
-        exit(98);
+#define BUF_SIZE 1024
+
+void print_error(char *error_msg) {
+    fprintf(stderr, "Error: %s\n", error_msg);
+    exit(98);
 }
 
-/**
- * print_elf_header - print ELF header information
- * @header: pointer to ELF header
- */
-void print_elf_header(Elf64_Ehdr *header)
-{
-        int i;
+void print_elf_header(Elf64_Ehdr elf_header) {
+    printf("ELF Header:\n");
+    printf("  Magic:   ");
+    for (int i = 0; i < EI_NIDENT; i++) {
+        printf("%02x ", elf_header.e_ident[i]);
+    }
+    printf("\n");
 
-        printf("  Magic:   ");
-        for (i = 0; i < EI_NIDENT; i++)
-                printf("%02x ", header->e_ident[i]);
-        printf("\n");
+    printf("  Class:                             %s\n", elf_header.e_ident[EI_CLASS] == ELFCLASS64 ? "ELF64" : "ELF32");
+    printf("  Data:                              %s\n", elf_header.e_ident[EI_DATA] == ELFDATA2MSB ? "2's complement, big endian" : "2's complement, little endian");
+    printf("  Version:                           %d\n", elf_header.e_ident[EI_VERSION]);
+    printf("  OS/ABI:                            %s\n", elf_header.e_ident[EI_OSABI] == ELFOSABI_SYSV ? "UNIX - System V" : "UNIX - Other");
+    printf("  ABI Version:                       %d\n", elf_header.e_ident[EI_ABIVERSION]);
+    printf("  Type:                              ");
+    switch (elf_header.e_type) {
+        case ET_NONE:
+            printf("NONE (None)\n");
+            break;
+        case ET_REL:
+            printf("REL (Relocatable file)\n");
+            break;
+        case ET_EXEC:
+            printf("EXEC (Executable file)\n");
+            break;
+        case ET_DYN:
+            printf("DYN (Shared object file)\n");
+            break;
+        case ET_CORE:
+            printf("CORE (Core file)\n");
+            break;
+        default:
+            printf("<unknown: %x>\n", elf_header.e_type);
+            break;
+    }
+    printf("  Entry point address:               %lx\n", elf_header.e_entry);
+}
 
-        printf("  Class:                             ");
-        switch (header->e_ident[EI_CLASS])
-        {
-                case ELFCLASSNONE: printf("none\n"); break;
-                case ELFCLASS32:   printf("ELF32\n"); break;
-                case ELFCLASS64:   printf("ELF64\n"); break;
-                default:           printf("<unknown: %x>\n", header->e_ident[EI_CLASS]);
-        }
+int main(int argc, char **argv) {
+    if (argc != 2) {
+        print_error("Invalid number of arguments");
+    }
 
-        printf("  Data:                              ");
-        switch (header->e_ident[EI_DATA])
-        {
-                case ELFDATANONE: printf("none\n"); break;
-                case ELFDATA2LSB: printf("2's complement, little endian\n"); break;
-                case ELFDATA2MSB: printf("2's complement, big endian\n"); break;
-                default:          printf("<unknown: %x>\n", header->e_ident[EI_DATA]);
-        }
+    int fd = open(argv[1], O_RDONLY);
+    if (fd == -1) {
+        print_error("Unable to open file");
+    }
 
-        printf("  Version:                           %d\n", header->e_ident[EI_VERSION]);
+    char buf[BUF_SIZE];
+    ssize_t n_read = read(fd, buf, BUF_SIZE);
+    if (n_read == -1) {
+        print_error("Unable to read from file");
+    }
 
-        printf("  OS/ABI:                            ");
-        switch (header->e_ident[EI_OSABI])
-        {
-                case ELFOSABI_NONE:     printf("UNIX System V ABI\n"); break;
-                case ELFOSABI_HPUX:     printf("HP-UX ABI\n"); break;
-                case ELFOSABI_NETBSD:   printf("NetBSD ABI\n"); break;
-                case ELFOSABI_LINUX:    printf("Linux ABI\n"); break;
-                case ELFOSABI_SOLARIS:  printf("Solaris ABI\n"); break;
-                case ELFOSABI_AIX:      printf("AIX ABI\n"); break;
-                case ELFOSABI_IRIX:     printf("IRIX ABI\n"); break;
-                case ELFOSABI_FREEBSD:  printf("FreeBSD ABI\n"); break;
-                case ELFOSABI_TRU64:    printf("TRU64 UNIX ABI\n"); break;
-                case ELFOSABI_MODESTO:  printf("Novell Modesto ABI\n"); break;
-                case ELFOSABI_OPENBSD:  printf("OpenBSD ABI\n"); break;
-                case ELFOSABI_ARM_AEABI:printf("ARM EABI\n"); break;
-                case ELFOSABI_ARM:      printf("ARM\n"); break;
-                case ELFOSABI_STANDALONE: printf("Standalone (embedded) application\n"); break;
-                default:                printf("<unknown: %x>\n", header->e_ident[EI_OSABI]);
-        }
+    Elf64_Ehdr elf_header;
+    memcpy(&elf_header, buf, sizeof(Elf64_Ehdr));
 
-        printf("  ABI Version:                       %d\n", header->e_ident[EI_ABIVERSION]);
+    if (memcmp(elf_header.e_ident, ELFMAG, SELFMAG) != 0) {
+        print_error("Not an ELF file");
+    }
 
-        printf("  Type:                              ");
-        switch (header->e_type)
-        {
-                case ET_NONE:     printf("none\n"); break;
-                case ET_REL:      printf("relocatable\n"); break;
+    print_elf_header(elf_header);
+
+    if (close(fd) == -1) {
+        print_error("Unable to close file");
+    }
+
+    return 0;
+}
 
