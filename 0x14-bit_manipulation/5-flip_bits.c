@@ -1,65 +1,26 @@
 #include "main.h"
 
 /**
- * print_bin - prints binary rep of @n
+ * flip_bits - Returns the number of bits needed to flip to get from one number to another
+ * @n: The first number
+ * @m: The second number
  *
- * @number: decimal value
- *
- * Return: nothing
-*/
-void print_bin(unsigned long int number)
-{
-	if (number >> 1)
-		print_bin(number >> 1);
-
-	putc((number & 1) ? '1' : '0', stdout);
-}
-
-/**
- * flip_bits - a function that returns the number of bits you
- *             would need to flip to get from one number to
- *             another
- *
- * @n: decimal number
- * @m: the other decimal number
- *
- * Return: number of bits to flip to get @m from @n
-*/
+ * Return: The number of bits needed to flip
+ */
 unsigned int flip_bits(unsigned long int n, unsigned long int m)
 {
-	unsigned int diff_bits = 0;
-	unsigned long int diff;
+    unsigned long int xor_result = n ^ m;
+    unsigned int count = 0;
 
-	/*xor n and b*/
-	diff = n ^ m;
+    /* Count the number of set bits in xor_result */
+    while (xor_result != 0)
+    {
+        /* Increment count if the least significant bit is set */
+        count += xor_result & 1;
+        /* Shift xor_result to the right */
+        xor_result >>= 1;
+    }
 
-	#ifdef DEBUG
-	printf("\n(n) %ld and (m) %ld in binary is ", n, m);
-	print_bin(n);
-	printf(" ");
-	print_bin(m);
-	printf(" diff is %ld and in binary is ", diff);
-	print_bin(diff);
-	printf("\n");
-	#endif
-
-	/*keep shifting diff to right*/
-	do {
-		#ifdef DEBUG
-		printf("diff %ld before right shift ", diff);
-		print_bin(diff);
-		printf("\n");
-		#endif
-
-		diff_bits += (diff & 1);
-		diff >>= 1;
-
-		#ifdef DEBUG
-		printf("diff %ld after right shift ", diff);
-		print_bin(diff);
-		printf(" and diff_bit %d before leaving loop\n\n", diff_bits);
-		#endif
-	} while (diff > 0);
-
-	return (diff_bits);
+    return count;
 }
+
