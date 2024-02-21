@@ -1,20 +1,35 @@
+#include <stdlib.h>
+#include <string.h>
 #include <stdio.h>
 #include "lists.h"
 
 /**
- * main - check the code for Holberton School students.
+ * main - check the code
  *
- * Return: Always 0.
+ * Return: Always EXIT_SUCCESS.
  */
 int main(void)
 {
-	dlistint_t head = {9, 0, 0};
-	dlistint_t tail = {6, 0, 0};
-	size_t n;
+    dlistint_t *head;
+    dlistint_t *new;
+    dlistint_t hello = {8, NULL, NULL};
+    size_t n;
 
-	head.next = &tail;
-	tail.prev = &head;
-	n = dlistint_len(&head);
-	printf("-> %lu elements\n", n);
-	return (0);
+    head = &hello;
+    new = malloc(sizeof(dlistint_t));
+    if (new == NULL)
+    {
+        dprintf(2, "Error: Can't malloc\n");
+        return (EXIT_FAILURE);
+    }
+    new->n = 9;
+    head->prev = new;
+    new->next = head;
+    new->prev = NULL;
+    head = new;
+    n = dlistint_len(head);  // Corrected: Pass 'head', not '&head'
+    printf("-> %lu elements\n", n);
+    free(new);
+    return (EXIT_SUCCESS);
 }
+
