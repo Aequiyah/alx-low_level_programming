@@ -24,7 +24,7 @@ dlistint_t *add_dnodeint_end(dlistint_t **head, const int n)
         return new_node;
     }
 
-    dlistint_t *last = *head;
+    dlistint_t *last = *head; // Declaration moved to the beginning
     while (last->next != NULL)
     {
         last = last->next;
