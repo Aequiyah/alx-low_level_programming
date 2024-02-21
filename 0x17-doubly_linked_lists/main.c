@@ -1,5 +1,4 @@
 #include <stdlib.h>
-#include <string.h>
 #include <stdio.h>
 #include "lists.h"
 
@@ -10,26 +9,24 @@
  */
 int main(void)
 {
-    dlistint_t *head;
-    dlistint_t *new;
-    dlistint_t hello = {8, NULL, NULL};
-    size_t n;
+    dlistint_t *head = NULL;
+    dlistint_t *ptr;
+    int ints[] = {0, 1, 2, 3, 4, 98, 402, 1024};
+    size_t i, n;
 
-    head = &hello;
-    new = malloc(sizeof(dlistint_t));
-    if (new == NULL)
+    for (i = 0; i < sizeof(ints) / sizeof(ints[0]); i++)
     {
-        dprintf(2, "Error: Can't malloc\n");
-        return (EXIT_FAILURE);
+        ptr = add_dnodeint(&head, ints[i]);
+        if (ptr == NULL)
+        {
+            fprintf(stderr, "Failed to add node\n");
+            return EXIT_FAILURE;
+        }
     }
-    new->n = 9;
-    head->prev = new;
-    new->next = head;
-    new->prev = NULL;
-    head = new;
-    n = dlistint_len(head);  // Corrected: Pass 'head', not '&head'
+
+    n = print_dlistint(head);
     printf("-> %lu elements\n", n);
-    free(new);
-    return (EXIT_SUCCESS);
+
+    return EXIT_SUCCESS;
 }
 
